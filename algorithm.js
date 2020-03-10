@@ -1,22 +1,24 @@
 //Main of the javascript
-function main(){
- var _v = [ { label: "a" }, { label: "b" }, { label: "c" }, { label: "d" }, { label: "e" }, { label: "f" }, { label: "g" }]; 
- var _e = [ { u:0 , t: 1, d: 3 }, { u: 0, t: 2, d: 5 }, { u: 0, t: 3, d: 4 }, { u: 1, t: 4, d: 3 }, { u: 1, t: 5, d: 6 }, { u: 2, t: 3, d: 2 }, { u: 2, t: 6, d: 4 }, { u: 3, t: 4, d: 1 }, { u: 3, t: 7, d: 5 }, { u: 4, t: 5, d: 2 }, { u: 4, t: 8, d: 4 },
-	{ u: 5, t: 9, d: 5 }, { u: 6, t: 7, d: 3 }, { u: 6, t: 10, d: 6 }, { u: 7, t: 10, d: 7 }, { u: 7, t: 8,  d: 6 }];
-  
-  var g = new Graph();
-  g.create_map(_v, _e);
-	
-  g.printGraphImpl();	
+function main() {
+    var _v = [{ label: "a" }, { label: "b" }, { label: "c" }, { label: "d" }, { label: "e" }, { label: "f" }, { label: "g" }];
+    var _e = [{ u: 0, t: 1, d: 3 }, { u: 0, t: 2, d: 5 }, { u: 0, t: 3, d: 4 }, { u: 1, t: 4, d: 3 }, { u: 1, t: 5, d: 6 }, { u: 2, t: 3, d: 2 }, { u: 2, t: 6, d: 4 }, { u: 3, t: 4, d: 5 }, { u: 4, t: 5, d: 2 }, { u: 4, t: 6, d: 4 }, { u: 6, t: 5, d: 6 }];
+    //, { u: 7, t: 4,  d: 6 }
+    var g = new Graph();
+    g.create_map(_v, _e);
+    document.write("<br>Graph: <br>");
+    g.printGraph();
 }
+
 //Graph class to represent visualization map
 function Graph(){
   this.vert = [];
-  this.vert_num = 0;
-  this.edge_num = 0;
+  this.vertnum = 0;
+  this.edgenum = 0;
   this.connected_num = 0;
   this.label = "";
-  this.printGraph = printGraphImpl;
+    //methods of graph
+    this.create_map = createMapFunction;
+    this.printGraph = printGraphFunction;
 }
 //Vertex class to represent package location
 function Vertex(v){
@@ -24,37 +26,64 @@ function Vertex(v){
   this.visit = false;
   this.adjacent = new List();
   //Functions of vertex
-  this.insertAdj = insertAdjacent;
+    this.insertAdj = insertAdjacent;
+    this.adjacentById = adjacentByIdImpl;
+    this.vertexInfo = vertexInfoImpl;
 }
 //Edge class to represent path of location
 function Edge(t, d){
   this.target = t;
   this.distanc = d;
 }
-//Create map
-function create_map(vert, edge){
-  this.vertnum = vert.length;
-  this.edgenum = vert.length;
-  //Add vertex into the array
-  for(var i = 0; i < this.vertnum; i++)
-    this.vertex[i] = new Vertex(vert[i]);
-  //Add edge to vertex
-  for(var i = 0; i < this.edgenum; i++){
-    var u = this.vertex[e[i].u];
-    u.insertAdj(edge[i].t, edge[i].d);
-  }
-}
-function insertAdjacent(t, d){
-  var edge = new Edge(t, d);
-  this.adjacent.insert(edge);
-}
-//
 
-//Print graph method
-function printGraphImpl(){
-       console.log("GRAPH {", this.label, "} ", this.weighted ? "" : "UN", "WEIGHTED, ", this.digraph ? "" : "UN", "DIRECTED - ", this.nv, " VERTICES, ", this.ne, " EDGES:");
-       var connect = this.connectedComponant;
-       (connect == 0) ? console.log("no connectivity info"): 
-       console.log("DISCONNECTED ", connect, " ");
-       this.list_vert();
-   }
+//Create map
+function createMapFunction(v, e) {
+    this.vertnum = v.length;
+    this.edgenum = e.length;
+    //Add vertex into the array
+    for (var i = 0; i < this.vertnum; i++) {
+        this.vert[i] = new Vertex(v[i]);
+    }
+    //Add edge to vertex
+    for(var i = 0; i < this.edgenum; i++){
+        var u = this.vert[e[i].u];
+        var v = this.vert[e[i].t];
+        u.insertAdj(e[i].t, e[i].d);
+        v.insertAdj(e[i].u, e[i].d);
+    }
+   
+}
+
+function insertAdjacent(t, d) {
+    var edge = !(d === undefined) ? new Edge(t, d) : new Edge(t);
+    this.adjacent.insert(edge);
+
+    //Look for adjacent
+    var adjacent_Id = [];
+    var edge_adj = this.adjacent.traverse();
+    for (var i = 0; i < edge_adj.length; i++) {
+        adjacent_Id[i] = edge_adj[i].target;
+    }
+    //print graph...
+}
+
+//print method
+function printGraphFunction() {
+    for (var i = 0; i < this.vertnum; i++)
+    {
+        var v = this.vert[i];
+        document.write("VERTEX: ", i, v.vertexInfo(), "<br>");
+    }
+}
+
+function vertexInfoImpl() {
+    return (" {" + this.label + "} - VISIT: " + this.visit + " - ADJACENCY: " + this.adjacentById());
+}
+
+function adjacentByIdImpl() {
+    var adjacent_Id = [];
+    var edge_adj = this.adjacent.traverse();
+    for (var i = 0; i < edge_adj.length; i++)
+        adjacent_Id[i] = edge_adj[i].target;
+    return adjacent_Id;
+}
