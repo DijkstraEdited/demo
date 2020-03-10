@@ -30,3 +30,4 @@ function create_map(vert, edge){
     this.adjacent.insert(edge);
   }
 }
+//
