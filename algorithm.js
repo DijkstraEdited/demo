@@ -26,7 +26,7 @@ function create_map(vert, edge){
     this.vertex[i] = new Vertex(vert[i]);
   //Add edge to vertex
   for(var i = 0; i < this.edgenum; i++){
-    var edge = new Edge(edge[i]);
+    var edge = new Edge(edge[i].t, edge[i].d);
     this.adjacent.insert(edge);
   }
 }
