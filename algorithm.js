@@ -6,6 +6,8 @@ function main(){
   
   var g = new Graph();
   g.create_map(_v, _e);
+	
+  g.printGraphImpl();	
 }
 //Graph class to represent visualization map
 function Graph(){
@@ -14,6 +16,7 @@ function Graph(){
   this.edge_num = 0;
   this.connected_num = 0;
   this.label = "";
+  this.printGraph = printGraphImpl;
 }
 //Vertex class to represent package location
 function Vertex(v){
@@ -46,3 +49,12 @@ function insertAdjacent(t, d){
   this.adjacent.insert(edge);
 }
 //
+
+//Print graph method
+function printGraphImpl(){
+       console.log("GRAPH {", this.label, "} ", this.weighted ? "" : "UN", "WEIGHTED, ", this.digraph ? "" : "UN", "DIRECTED - ", this.nv, " VERTICES, ", this.ne, " EDGES:");
+       var connect = this.connectedComponant;
+       (connect == 0) ? console.log("no connectivity info"): 
+       console.log("DISCONNECTED ", connect, " ");
+       this.list_vert();
+   }
