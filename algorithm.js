@@ -24,7 +24,7 @@ function Graph(){
 
 //Vertex class to represent package location
 function Vertex(v){
-  this.label = v.label;//<--Could be coordinates of package location
+  this.label = v.label;//<--Could be recipient location
   this.visit = false;
   this.adjacent = new List();
   //Functions of vertex
