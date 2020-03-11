@@ -81,11 +81,9 @@ function vertexInfoImpl() {
 //Get adjacents nodes
 function adjacentByIdImpl() {
     var adjacent_Id = [];
-    var distances = [];
     var edge_adj = this.adjacent.traverse();
     for (var i = 0; i < edge_adj.length; i++) {
         adjacent_Id[i] = edge_adj[i].target;
-        distances[i] = edge_adj[i].distanc;
     }
     return adjacent_Id;
 }
@@ -102,5 +100,16 @@ function distancByIdFunction() {
 
 //Dijkstra algorithm
 function dijkstraAlgorithm() {
-
+    var nodes = [], adjacent = [], distancs = [];
+    //Get nodes
+    for (var i = 0; i < this.vert.length; i++) {
+        var v = this.vert[i];
+        nodes[i] = v.label;
+    }
+    //Get adjacent(s) and its distances
+    for (var i = 0; i < this.vert.length; i++) {
+        var v = this.vert[i];
+        adjacent = v.adjacentById();
+        distancs = v.distanceById();
+    }
 }
