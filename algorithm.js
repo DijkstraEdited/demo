@@ -2,7 +2,6 @@
 function main() {
     var _v = [{ label: "a" }, { label: "b" }, { label: "c" }, { label: "d" }, { label: "e" }, { label: "f" }, { label: "g" }];
     var _e = [{ u: 0, t: 1, d: 3 }, { u: 0, t: 2, d: 5 }, { u: 0, t: 3, d: 4 }, { u: 1, t: 4, d: 3 }, { u: 1, t: 5, d: 6 }, { u: 2, t: 3, d: 2 }, { u: 2, t: 6, d: 4 }, { u: 3, t: 4, d: 5 }, { u: 4, t: 5, d: 2 }, { u: 4, t: 6, d: 4 }, { u: 6, t: 5, d: 6 }];
-    //, { u: 7, t: 4,  d: 6 }
     var g = new Graph();
     g.create_map(_v, _e);
     document.write("<br>Graph: <br>");
