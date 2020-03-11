@@ -7,6 +7,7 @@ function main() {
     g.create_map(_v, _e);
     document.write("<br>Graph: <br>");
     g.printGraph();
+    g.dijkstra();
 }
 
 //Graph class to represent visualization map
@@ -19,6 +20,7 @@ function Graph(){
     //methods of graph
     this.create_map = createMapFunction;
     this.printGraph = printGraphFunction;
+    this.dijkstra = dijkstraAlgorithm;
 }
 
 //Vertex class to represent package location
@@ -97,4 +99,9 @@ function distancByIdFunction() {
         distances[i] = edge_adj[i].distanc;
     }
     return distances;
+}
+
+//Dijkstra algorithm
+function dijkstraAlgorithm() {
+
 }
