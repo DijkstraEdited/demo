@@ -20,6 +20,7 @@ function Graph(){
     this.create_map = createMapFunction;
     this.printGraph = printGraphFunction;
 }
+
 //Vertex class to represent package location
 function Vertex(v){
   this.label = v.label;//<--Could be coordinates of package location
@@ -28,8 +29,10 @@ function Vertex(v){
   //Functions of vertex
     this.insertAdj = insertAdjacent;
     this.adjacentById = adjacentByIdImpl;
+    this.distanceById = distancByIdFunction;
     this.vertexInfo = vertexInfoImpl;
 }
+
 //Edge class to represent path of location
 function Edge(t, d){
   this.target = t;
@@ -54,20 +57,13 @@ function createMapFunction(v, e) {
    
 }
 
+//Insert adjacente(s)
 function insertAdjacent(t, d) {
     var edge = !(d === undefined) ? new Edge(t, d) : new Edge(t);
     this.adjacent.insert(edge);
-
-    //Look for adjacent
-    var adjacent_Id = [];
-    var edge_adj = this.adjacent.traverse();
-    for (var i = 0; i < edge_adj.length; i++) {
-        adjacent_Id[i] = edge_adj[i].target;
-    }
-    //print graph...
 }
 
-//print method
+//Print method
 function printGraphFunction() {
     for (var i = 0; i < this.vertnum; i++)
     {
@@ -76,14 +72,29 @@ function printGraphFunction() {
     }
 }
 
+//Cont. print
 function vertexInfoImpl() {
-    return (" {" + this.label + "} - VISIT: " + this.visit + " - ADJACENCY: " + this.adjacentById());
+    return (" {" + this.label + "} - VISIT: " + this.visit + " - ADJACENCY: " + this.adjacentById()+" - DISTANC: "+this.distanceById());
 }
 
+//Get adjacents nodes
 function adjacentByIdImpl() {
     var adjacent_Id = [];
+    var distances = [];
     var edge_adj = this.adjacent.traverse();
-    for (var i = 0; i < edge_adj.length; i++)
+    for (var i = 0; i < edge_adj.length; i++) {
         adjacent_Id[i] = edge_adj[i].target;
+        distances[i] = edge_adj[i].distanc;
+    }
     return adjacent_Id;
+}
+
+//Get distanc between two nodes
+function distancByIdFunction() {
+    var distances = [];
+    var edge_adj = this.adjacent.traverse();
+    for (var i = 0; i < edge_adj.length; i++) {
+        distances[i] = edge_adj[i].distanc;
+    }
+    return distances;
 }
