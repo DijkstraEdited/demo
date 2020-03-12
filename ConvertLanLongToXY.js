@@ -1,6 +1,6 @@
 
 //1- Input sample rof jeddah, alkhalduah district 
-//4 locations has been chosen randoly 
+//4 locations has been chosen randomly 
 
 const A = {
 lan: 21.551304,
