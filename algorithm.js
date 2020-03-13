@@ -112,7 +112,7 @@ function createMapFunction(v, e) {
         var u = this.vert[e[i].u];
         var v = this.vert[e[i].t];
         u.insertAdj(e[i].t, e[i].d);
-        v.insertAdj(e[i].u, e[i].d);
+        //v.insertAdj(e[i].u, e[i].d);
     }
    
 }
