@@ -208,11 +208,11 @@ function dijkstraAlg(Source) {
         var adj = this.vert[Vt[i]].adjacent.traverse(); // find adjacent of vertex u 
 
         for (var j = 0; j < adj.length; j++) {
-            if (u.prior + adj[j].distanc < d[adj[j].target] && !u.visit) {
+            if (u.prior + adj[j].distanc < d[adj[j].target]) { // && !u.visit
                 d[adj[j].target] = u.prior + adj[j].distanc;
                 p[adj[j].target] = u.item;
                 PQ.decrease(adj[j].target, d[adj[j].target]); // update proirity queue 
-                u.visit=true; //Mark this node as visited 
+                //u.visit=true; //Mark this node as visited 
             }
         }
     }
