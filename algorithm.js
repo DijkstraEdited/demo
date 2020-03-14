@@ -63,30 +63,46 @@ function main() {
     g.create_map(_v, _e);
     document.write("<br>Graph: <br>");
     g.printGraph();
+    // Initilize Dijkstra Matrix 
+    for (var i = 0; i < g.vertnum; i++) {
+        g.DijkstraMatrix[i] = [];
+
+        for (var j = 0; j < g.nv; j++) {
+            g.DijkstraMatrix[i][j] = 0;
+        }
+    }
     g.dijkstra(0);
+    document.write("<br>Shortest paths by Dijkstra from vertex 0<br>");
+    var i;
+    for (i = 0; i < g.vertnum; i++) {
+        document.write(g.vt[i].d, "(", g.vt[i].p, ",", g.vt[i].t, "),");
+    }
 }
 
 //Graph class to represent visualization map
-function Graph(){
-  this.vert = [];
-  this.vertnum = 0;
-  this.edgenum = 0;
-  this.connected_num = 0;
+function Graph() {
+    this.vert = [];
+    this.vertnum = 0;
+    this.edgenum = 0;
+    this.connected_num = 0;
     this.label = "";
     this.vt = []; //for the result
     //methods of graph
     this.create_map = createMapFunction;
     this.printGraph = printGraphFunction;
     //this.dijkstra = dijkstraAlgorithm;
-    this.dijkstra = dijkstraAlg;
+    //this.dijkstra = dijkstraAlg;
+    this.dijkstra = DijkstraImpl;
+    this.DijkstraMatrix = [];
+    this.vt = [];
 }
 
 //Vertex class to represent package location
-function Vertex(v){
-  this.label = v.label;//<--Could be coordinates of package location
-  this.visit = false;
-  this.adjacent = new List();
-  //Functions of vertex
+function Vertex(v) {
+    this.label = v.label;//<--Could be coordinates of package location
+    this.visit = false;
+    this.adjacent = new List();
+    //Functions of vertex
     this.insertAdj = insertAdjacent;
     this.adjacentById = adjacentByIdImpl;
     this.distanceById = distancByIdFunction;
@@ -94,9 +110,9 @@ function Vertex(v){
 }
 
 //Edge class to represent path of location
-function Edge(t, d){
-  this.target = t;
-  this.distanc = d;
+function Edge(t, d) {
+    this.target = t;
+    this.distanc = d;
 }
 
 //Create map
@@ -108,13 +124,13 @@ function createMapFunction(v, e) {
         this.vert[i] = new Vertex(v[i]);
     }
     //Add edge to vertex
-    for(var i = 0; i < this.edgenum; i++){
+    for (var i = 0; i < this.edgenum; i++) {
         var u = this.vert[e[i].u];
         var v = this.vert[e[i].t];
         u.insertAdj(e[i].t, e[i].d);
         //v.insertAdj(e[i].u, e[i].d);
     }
-   
+
 }
 
 //Insert adjacente(s)
@@ -125,8 +141,7 @@ function insertAdjacent(t, d) {
 
 //Print method
 function printGraphFunction() {
-    for (var i = 0; i < this.vertnum; i++)
-    {
+    for (var i = 0; i < this.vertnum; i++) {
         var v = this.vert[i];
         document.write("VERTEX: ", i, v.vertexInfo(), "<br>");
     }
@@ -134,7 +149,7 @@ function printGraphFunction() {
 
 //Cont. print
 function vertexInfoImpl() {
-    return (" {" + this.label + "} - VISIT: " + this.visit + " - ADJACENCY: " + this.adjacentById()+" - DISTANC: "+this.distanceById());
+    return (" {" + this.label + "} - VISIT: " + this.visit + " - ADJACENCY: " + this.adjacentById() + " - DISTANC: " + this.distanceById());
 }
 
 //Get adjacents nodes
@@ -208,11 +223,11 @@ function dijkstraAlg(Source) {
         var adj = this.vert[Vt[i]].adjacent.traverse(); // find adjacent of vertex u 
 
         for (var j = 0; j < adj.length; j++) {
-            if (u.prior + adj[j].distanc < d[adj[j].target]) { // && !u.visit
+            if (u.prior + adj[j].distanc < d[adj[j].target] ) {
                 d[adj[j].target] = u.prior + adj[j].distanc;
                 p[adj[j].target] = u.item;
                 PQ.decrease(adj[j].target, d[adj[j].target]); // update proirity queue 
-                //u.visit=true; //Mark this node as visited 
+                //u.visit = true; //Mark this node as visited 
             }
         }
     }
@@ -222,4 +237,60 @@ function dijkstraAlg(Source) {
         document.write(d[i], "(" + p[Vt[i]] + "," + Vt[i] + ") ,");
     }
     document.write(d[i], "(" + p[Vt[i]] + "," + Vt[i] + ").");
+}
+
+function DijkstraImpl(Source) {
+    //creat priority queue 
+    var pq = new PQueue();
+    //store the deleted minimum priority element
+    var u;
+    var DijkstraArray = [];
+    //initialize pqueue 
+    for (var i = 0; i < this.vertnum; i++) {
+        DijkstraArray[i] = {
+            d: Infinity,
+            p: "-",
+        }
+
+        pq.insert(i, DijkstraArray[i].d);
+        this.vert[i].visit = false;
+    }
+    //initialize the array
+    DijkstraArray[Source] = {
+        p: "-",
+        d: 0
+    }
+    //update priority of s with ds
+    pq.decrease(Source, DijkstraArray[Source].d);
+    //serch for the shortest path 
+    for (var i = 0; i < this.vertnum; i++) {
+        //delete the minimum priority element
+        u = pq.deleteMin();
+        //initialize the array
+        this.vt[u.item] = {
+
+            p: DijkstraArray[u.item].p,
+            t: u.item,
+            d: DijkstraArray[u.item].d
+        };
+
+        this.vert[u.item].visit = true;
+        var adj = this.vert[u.item].adjacent.traverse();
+
+        //update fringe set after adding u*
+        for (var j = 0; j < adj.length; j++) {
+            if (!this.vert[adj[j].target].visit) {
+                if (u.prior + adj[j].distanc < DijkstraArray[adj[j].target].d) {
+                    DijkstraArray[adj[j].target] = {
+                        p: u.item,
+                        t: adj[j].target,
+                        d: u.prior + adj[j].distanc
+
+                    }
+                    pq.decrease(adj[j].target, DijkstraArray[adj[j].target].d);
+                    this.DijkstraMatrix[Source][adj[j].target] = u.prior + adj[j].distance;
+                }
+            }
+        }
+    }
 }
