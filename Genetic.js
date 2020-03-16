@@ -35,6 +35,15 @@ function main() {
         { u: 4, t: 3, d: 3 },
     ];
 
+    var totalCities = 5;
+    var Fitness =[];
+    var recordDistance = Infinity;
+    var population = [];
+    var popSize = 10;
+    var bestEver = []; 
+    
+    
+    
     //Create graph
     var g = new Graph();
     g.create_map(_v, _e);
