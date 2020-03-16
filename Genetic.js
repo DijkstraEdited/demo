@@ -135,7 +135,8 @@ function distancByIdFunction() {
     return distances;
 }
 
-
+// Calculate fitness function for each indviduale in population 
+// (fitness = sum of the distances from source to each nodes and back to the source)
 function fitness() {
     for (var i = 0 ; i < population.length ; i++){
         var d = calcDistance(Cities, population[i]);
