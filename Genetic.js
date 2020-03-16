@@ -42,20 +42,16 @@ function main() {
     var popSize = 10;
     var bestEver = []; 
     
-    
-    
     //Create graph
     var g = new Graph();
     g.create_map(_v, _e);
     document.write("<br>Graph: <br>");
     g.printGraph();
-    
+
     //Apply genetic algorithm
     g.generatePopulation(10);
-    //Print generation(s)
     for (var i = 0; i < g.population.length; i++)
-        document.write(g.population[i], "<br>");
-    
+        document.write(g.population[i].a, "<br>");
 }
 
 //Graph class to represent visualization map
@@ -64,11 +60,14 @@ function Graph() {
     this.vertnum = 0;
     this.edgenum = 0;
     this.label = "";
+    this.population = [];
     //methods of graph
     this.create_map = createMapFunction;
     this.printGraph = printGraphFunction;
+
     //Genetic method
     this.generatePopulation = population;
+    //this.calulDistance = calculateDistance;
 }
 
 //Vertex class to represent package location
@@ -81,6 +80,10 @@ function Vertex(v) {
     this.adjacentById = adjacentByIdImpl;
     this.distanceById = distancByIdFunction;
     this.vertexInfo = vertexInfoImpl;
+
+    //Functions for genetic
+    this.searchForVer = searchVert;
+    this.calulDistance = calculateDistance;
 }
 
 //Edge class to represent path of location
@@ -107,7 +110,7 @@ function createMapFunction(v, e) {
 
 //Insert adjacente(s)
 function insertAdjacent(t, d) {
-    var edge = new Edge(t, d);
+    var edge = !(d === undefined) ? new Edge(t, d) : new Edge(t);
     this.adjacent.insert(edge);
 }
 
@@ -144,46 +147,48 @@ function distancByIdFunction() {
     return distances;
 }
 
-// Calculate fitness function for each indviduale in population 
-// (fitness = sum of the distances from source to each nodes and back to the source)
+
 function fitness() {
-    for (var i = 0 ; i < population.length ; i++){
+    for (var i = 0; i < population.length; i++) {
         var d = calcDistance(Cities, population[i]);
-        if (d < recordDistance ){
+        if (d < recordDistance) {
             bestEver = population[i];
         }
         fitness[i] = 1 / (d + 1);
     }
 }
 
-function normlaizeFitness(){
+function normlaizeFitness() {
     var sum = 0;
-    for (var i = 0 ; i < fitness.length ; i++){
+    for (var i = 0; i < fitness.length; i++) {
         sum += fitness[i];
     }
 
-    for (var i = 0 ; i < fitness.length ; i++){
+    for (var i = 0; i < fitness.length; i++) {
         fitness[i] = fitness[i] / sum;
     }
 }
 
-
-function generatGeneration() {
+//Method for new population
+function generatGeneration(size) {
     var newPopulation = [];
-
-    for (var i = 0 ; i < population.length ; i++){
+    //First node in the path
+    newPopulation[0] = 0;
+    for (var i = 1; i < size; i++) {
         var order = pickOne(population, fitness);
         mutation(order);
         newPopulation[i] = order;
     }
+    //Last node in the path
+    newPopulation[size] = 0;
     population = newPopulation;
 }
 
-function pickOne(list, prob){
+function pickOne(list, prob) {
     var index = 0;
     var r = random(1);
 
-    while(r > 0){
+    while (r > 0) {
         r = r - prob[index];
         index++;
     }
@@ -197,23 +202,61 @@ function mutation(order, mutationRate) {
     swap(order, indexA, indexB);
 }
 
-function swap(a, i, j){
+function swap(a, i, j) {
     var temp = a[i];
     a[i] = a[j];
     a[j] = temp;
 }
 
+//To create only one population
 function population(numPop) {
     for (var f = 0; f < numPop; f++) {
         var order = [];
         for (var i = 0; i < this.vertnum - 1; i++) {
             order[i] = i + 1;
         }
+        this.population[f] =
+        {
+            a: order,
+            f: Infinity         //for fitness value
+        };
         var temp = shuffle(order);
         temp.splice(0, 0, 0);   //First node in the path
         temp.push(0);           //Last node in the path
-        this.population[f] = temp;
+        this.population[f].a = temp;
+        //document.write(this.population[f]);
+        //this.population[f].f = calulDistance(this.population[f]);//Calculate fitness
+        
     }
+}
+
+//For fitness function
+function fitness() {
+
+}
+
+//calculate distances
+function calculateDistance(onePopulation) {
+    var dis = 0;
+    var temp = onePopulation.a;
+    for (var i = 0; i < temp.length - 1; i++) {
+        var currentNode = temp[i];
+        var nextNode = temp[i + 1];
+        document.write(this.vert[0], "<br>");
+        var v1 = this.vert[currentNode];
+
+        var adjList = v1.adjacent.traverse();
+        //search for vertex
+        for (var j = 0; j < this.adjList.length; j++) {
+            if (adjList[j].target == nextNode) {
+                dis += adjList[j].distanc;
+            }
+        }        
+    }
+}
+
+//
+function searchVert(fisrt, second) {
 }
 
 function generatChromosome() {
@@ -224,7 +267,6 @@ function crossOver() {
 
 }
 
-//Random shuffling for array
 function shuffle(array) {
     var m = array.length, t, i;
 
