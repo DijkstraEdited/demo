@@ -34,6 +34,7 @@ function main() {
         { u: 4, t: 2, d: 10 },
         { u: 4, t: 3, d: 3 },
     ];
+
     //Create graph
     var g = new Graph();
     g.create_map(_v, _e);
@@ -97,7 +98,7 @@ function createMapFunction(v, e) {
 
 //Insert adjacente(s)
 function insertAdjacent(t, d) {
-    var edge = !(d === undefined) ? new Edge(t, d) : new Edge(t);
+    var edge = new Edge(t, d);
     this.adjacent.insert(edge);
 }
 
