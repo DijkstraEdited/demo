@@ -37,8 +37,61 @@ function main() {
 
     ];
 }
-function fitness() {
 
+function fitness() {
+    for (var i = 0 ; i < population.length ; i++){
+        var d = calcDistance(Cities, population[i]);
+        if (d < recordDistance ){
+            bestEver = population[i];
+        }
+        fitness[i] = 1 / (d + 1);
+    }
+}
+
+function normlaizeFitness(){
+    var sum = 0;
+    for (var i = 0 ; i < fitness.length ; i++){
+        sum += fitness[i];
+    }
+
+    for (var i = 0 ; i < fitness.length ; i++){
+        fitness[i] = fitness[i] / sum;
+    }
+}
+
+function generatGeneration() {
+    var newPopulation = [];
+
+    for (var i = 0 ; i < population.length ; i++){
+        var order = pickOne(population, fitness);
+        mutation(order);
+        newPopulation[i] = order;
+    }
+    population = newPopulation;
+}
+
+function pickOne(list, prob){
+    var index = 0;
+    var r = random(1);
+
+    while(r > 0){
+        r = r - prob[index];
+        index++;
+    }
+    index--;
+    return list[index].slice();
+}
+
+function mutation(order, mutationRate) {
+    var indexA = floor(random(order.length));
+    var indexB = floor(random(order.length));
+    swap(order, indexA, indexB);
+}
+
+function swap(a, i, j){
+    var temp = a[i];
+    a[i] = a[j];
+    a[j] = temp;
 }
 
 function population() {
@@ -49,20 +102,8 @@ function generatChromosome() {
 
 }
 
-function generatGeneration() {
-
-}
-
-function mutation() {
-
-}
-
-
 function crossOver() {
 
 }
-
-
-
 
 
