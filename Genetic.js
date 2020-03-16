@@ -41,6 +41,10 @@ function main() {
     g.printGraph();
     
     //Apply genetic algorithm
+    g.generatePopulation(10);
+    //Print generation(s)
+    for (var i = 0; i < g.population.length; i++)
+        document.write(g.population[i], "<br>");
     
 }
 
@@ -53,6 +57,8 @@ function Graph() {
     //methods of graph
     this.create_map = createMapFunction;
     this.printGraph = printGraphFunction;
+    //Genetic method
+    this.generatePopulation = population;
 }
 
 //Vertex class to represent package location
@@ -87,7 +93,6 @@ function createMapFunction(v, e) {
         var v = this.vert[e[i].t];
         u.insertAdj(e[i].t, e[i].d);
     }
-
 }
 
 //Insert adjacente(s)
@@ -151,6 +156,7 @@ function normlaizeFitness(){
     }
 }
 
+
 function generatGeneration() {
     var newPopulation = [];
 
@@ -186,8 +192,17 @@ function swap(a, i, j){
     a[j] = temp;
 }
 
-function population() {
-
+function population(numPop) {
+    for (var f = 0; f < numPop; f++) {
+        var order = [];
+        for (var i = 0; i < this.vertnum - 1; i++) {
+            order[i] = i + 1;
+        }
+        var temp = shuffle(order);
+        temp.splice(0, 0, 0);   //First node in the path
+        temp.push(0);           //Last node in the path
+        this.population[f] = temp;
+    }
 }
 
 function generatChromosome() {
@@ -198,4 +213,19 @@ function crossOver() {
 
 }
 
+//Random shuffling for array
+function shuffle(array) {
+    var m = array.length, t, i;
 
+    // While there remain elements to shuffle…
+    while (m) {
+            // Pick a remaining element…
+            i = Math.floor(Math.random() * m--);
+
+            // And swap it with the current element.
+            t = array[m];
+            array[m] = array[i];
+            array[i] = t;
+    }
+    return array;
+}
