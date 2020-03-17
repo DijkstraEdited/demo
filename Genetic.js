@@ -55,15 +55,22 @@ function main() {
     for (var i = 0; i < g.population.length; i++) {
         document.write(g.population[i].a, ", fitness: ", g.population[i].f, "<br>");
     }
+    document.write(">> Best population is : (", g.bestPopu, ") and it's fitness: (", g.recordPath,")<br>");
 }
 
 //Graph class to represent visualization map
 function Graph() {
+    //Variables for graph alg.
     this.vert = [];
     this.vertnum = 0;
     this.edgenum = 0;
     this.label = "";
+    
+    //Variables for genetic alg.
     this.population = [];
+    this.bestPopu;
+    this.recordPath = Infinity;
+    
     //methods of graph
     this.create_map = createMapFunction;
     this.printGraph = printGraphFunction;
@@ -239,6 +246,10 @@ function fitness() {
             dis += v.findDis(temp[j + 1]);      //Summation the distance between current and next node
         }
         this.population[i].f = dis;
+        if (dis < this.recordPath) {
+            this.recordPath = dis;
+            this.bestPopu = this.population[i].a;
+        }
         dis = 0;
     }
 }
