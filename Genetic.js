@@ -60,7 +60,7 @@ function main() {
 
 //Graph class to represent visualization map
 function Graph() {
-    //Variables for graph alg.
+    //Variables for graph
     this.vert = [];
     this.vertnum = 0;
     this.edgenum = 0;
