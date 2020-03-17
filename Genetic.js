@@ -50,8 +50,11 @@ function main() {
 
     //Apply genetic algorithm
     g.generatePopulation(10);
-    for (var i = 0; i < g.population.length; i++)
-        document.write(g.population[i].a, "<br>");
+    g.findFitness();
+    document.write("<br>Population(s) and Fitness(s):<br>");
+    for (var i = 0; i < g.population.length; i++) {
+        document.write(g.population[i].a, ", fitness: ", g.population[i].f, "<br>");
+    }
 }
 
 //Graph class to represent visualization map
@@ -67,7 +70,7 @@ function Graph() {
 
     //Genetic method
     this.generatePopulation = population;
-    //this.calulDistance = calculateDistance;
+    this.findFitness = fitness;
 }
 
 //Vertex class to represent package location
@@ -82,8 +85,7 @@ function Vertex(v) {
     this.vertexInfo = vertexInfoImpl;
 
     //Functions for genetic
-    this.searchForVer = searchVert;
-    this.calulDistance = calculateDistance;
+    this.findDis = findDistance;
 }
 
 //Edge class to represent path of location
@@ -208,7 +210,7 @@ function swap(a, i, j) {
     a[j] = temp;
 }
 
-//To create only one population
+//To create number of population(s)
 function population(numPop) {
     for (var f = 0; f < numPop; f++) {
         var order = [];
@@ -224,49 +226,36 @@ function population(numPop) {
         temp.splice(0, 0, 0);   //First node in the path
         temp.push(0);           //Last node in the path
         this.population[f].a = temp;
-        //document.write(this.population[f]);
-        //this.population[f].f = calulDistance(this.population[f]);//Calculate fitness
-        
     }
 }
 
 //For fitness function
 function fitness() {
-
-}
-
-//calculate distances
-function calculateDistance(onePopulation) {
     var dis = 0;
-    var temp = onePopulation.a;
-    for (var i = 0; i < temp.length - 1; i++) {
-        var currentNode = temp[i];
-        var nextNode = temp[i + 1];
-        document.write(this.vert[0], "<br>");
-        var v1 = this.vert[currentNode];
-
-        var adjList = v1.adjacent.traverse();
-        //search for vertex
-        for (var j = 0; j < this.adjList.length; j++) {
-            if (adjList[j].target == nextNode) {
-                dis += adjList[j].distanc;
-            }
-        }        
+    for (var i = 0; i < this.population.length; i++) {
+        var temp = this.population[i].a;
+        for (var j = 0; j < temp.length; j++) {
+            var v = this.vert[temp[j]];         //Get the current node
+            dis += v.findDis(temp[j + 1]);      //Summation the distance between current and next node
+        }
+        this.population[i].f = dis;
+        dis = 0;
     }
 }
 
-//
-function searchVert(fisrt, second) {
+//Find distance of two nodes
+function findDistance(nextNode) {
+    var adjList = this.adjacent.traverse();     //Find the adjacent of the node
+    var sum = 0;
+    for (var j = 0; j < adjList.length; j++) {  //Look for the matching one
+        if (adjList[j].target == nextNode) {    
+            return adjList[j].distanc;          //Return the distance
+        }
+    }
+    return 0;
 }
 
-function generatChromosome() {
-
-}
-
-function crossOver() {
-
-}
-
+//To shuffle an array
 function shuffle(array) {
     var m = array.length, t, i;
 
@@ -283,6 +272,13 @@ function shuffle(array) {
     return array;
 }
 
+function generatChromosome() {
+
+}
+
+function crossOver() {
+
+}
 function calcDistance(points, order){
     var sum = 0;
 
