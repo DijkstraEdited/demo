@@ -56,6 +56,7 @@ function main() {
         document.write(g.population[i].a, ", fitness: ", g.population[i].f, "<br>");
     }
     document.write(">> Best population is : (", g.bestPopu, ") and it's fitness: (", g.recordPath,")<br>");
+    g.inversionMut(g.bestPopu);
 }
 
 //Graph class to represent visualization map
@@ -78,6 +79,7 @@ function Graph() {
     //Genetic method
     this.generatePopulation = population;
     this.findFitness = fitness;
+    this.inversionMut = inversionMutation;
 }
 
 //Vertex class to represent package location
@@ -283,6 +285,29 @@ function shuffle(array) {
     return array;
 }
 
+//Do Inversion Mutation
+function inversionMutation(chromosom) {
+    var indexA, indexB;
+    var subArray;
+    var chromSize = chromosom.length-2;
+    do {
+        indexA = Math.floor((Math.random() * chromSize) + 1);
+        indexB = Math.floor((Math.random() * chromSize) + 1);
+    } while (indexA == indexB);
+    //get sub-array from the original
+    if (indexA > indexB) {
+        var temp = indexA;
+        indexA = indexB;
+        indexB = temp;
+    }
+    subArray = chromosom.slice(indexA, indexB+1);
+    subArray = subArray.reverse();
+    for (var i = 0; i < subArray.length; i++) {
+        chromosom[indexA + i] = subArray[i];
+    }
+    document.write(">> After Inversion Mutation: ", chromosom);
+}
+
 function generatChromosome() {
 
 }
@@ -304,5 +329,3 @@ function calcDistance(points, order){
 
     return sum;
 }
-
-
