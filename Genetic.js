@@ -41,41 +41,88 @@ function main() {
     var population = [];
     var popSize = 10;
     var bestEver = [];
-
+    
+    var counter = 0; //threshold value
+    var repFitness = 0; //check for improvment
+    var bestInIndex = 0; //save best index of generation
+    
+    //To compare two best fitnesses
+    var bestFit1 = 0;
+    var bestFit2 = 0;
+    
     //Create graph
     var g = new Graph();
     g.create_map(_v, _e);
     document.write("<br>Graph: <br>");
     g.printGraph();
 
-    //Apply genetic algorithm
+    //Apply genetic algorithm: Generate new population with number of chromosomes
     g.generatePopulation(10);
-    for (var i = 0; i < g.population.length; i++)
-        document.write(g.population[i].a, "<br>");
-
-    document.write("<br>", "Cycle cross over:", "<br>");
-    document.write(cycleCrossOver(g.population[0].a, g.population[1].a), "<br>");
+    
+    //Check for threshold value and if there is no improvement in the fitness
+    while (counter < 10 && repFitness < 5) {
+        //Calculate fitness for each chromosome in the population
+        g.flag = 0;
+        g.findFitness();
+        if (g.flag == 1)
+            bestInIndex=counter;
+        document.write("<br>The -", counter, "- Population(s) and Fitness(s):<br>");
+        for (var i = 0; i < g.population.length; i++) {
+            document.write(g.population[i].a, ", fitness: ", g.population[i].f, "<br>");
+        }
+        document.write(">> Best chromosome in population #", bestInIndex, " is : (", g.bestPopu, ") and it's fitness: (", g.recordPath, ")<br>");
+        
+        //Apply cycle cross-over
+        for (var i = 0; i < g.population.length; i += 2)
+            g.cycleCrossover(g.population[i].a, g.population[i+1].a, i, i+1);
+    
+        //Apply inversion mutation
+        for (var i = 0; i < g.population.length; i++) {
+            g.inversionMut(g.population[i].a);
+        }
+        
+        //To Make comparision between 2 best path
+        if (counter % 2 == 0)
+            bestFit1 = g.recordPath;
+        else
+            bestFit2 = g.recordPath;
+        if (bestFit1 == bestFit2) 
+            repFitness++;
+        
+        counter++;
+    }
 }
-
-//Graph class to represent visualization map
+/*-----------------------Graph Methods-----------------------------
+Graph class to represent visualization map*/
 function Graph() {
     this.vert = [];
     this.vertnum = 0;
     this.edgenum = 0;
     this.label = "";
+    
+    //Variables for genetic
     this.population = [];
+    this.bestPopu;                  //for best chromosom in population
+    this.recordPath = Infinity;     //record of best chromosom
+    this.firstSmall;
+    this.secondSmall;
+    
     //methods of graph
     this.create_map = createMapFunction;
     this.printGraph = printGraphFunction;
 
     //Genetic method
     this.generatePopulation = population;
-    //this.calulDistance = calculateDistance;
+    this.findFitness = fitness;
+    this.cycleCrossover = cycleCrossOver;
+    this.inversionMut = inversionMutation;
+    this.doSinglePointCrossOver = singlePointCrossOver;
+    this.doSwapMutation = swapMutation;
 }
 
 //Vertex class to represent package location
 function Vertex(v) {
-    this.label = v.label;//<--Could be coordinates of package location
+    this.label = v.label;
     this.visit = false;
     this.adjacent = new List();
     //Functions of vertex
@@ -85,8 +132,8 @@ function Vertex(v) {
     this.vertexInfo = vertexInfoImpl;
 
     //Functions for genetic
-    this.searchForVer = searchVert;
     this.calulDistance = calculateDistance;
+    this.findDis = findDistance;
 }
 
 //Edge class to represent path of location
@@ -149,7 +196,7 @@ function distancByIdFunction() {
     }
     return distances;
 }
-
+//-----------------------End of Graph Methods-----------------------------
 
 function fitness() {
     for (var i = 0; i < population.length; i++) {
@@ -172,7 +219,6 @@ function normlaizeFitness() {
     }
 }
 
-//Method for new population
 function generatGeneration(size) {
     var newPopulation = [];
     //First node in the path
@@ -211,34 +257,6 @@ function swap(a, i, j) {
     a[j] = temp;
 }
 
-//To create only one population
-function population(numPop) {
-    for (var f = 0; f < numPop; f++) {
-        var order = [];
-        for (var i = 0; i < this.vertnum - 1; i++) {
-            order[i] = i + 1;
-        }
-        this.population[f] =
-        {
-            a: order,
-            f: Infinity         //for fitness value
-        };
-        var temp = shuffle(order);
-        temp.splice(0, 0, 0);   //First node in the path
-        temp.push(0);           //Last node in the path
-        this.population[f].a = temp;
-        //document.write(this.population[f]);
-        //this.population[f].f = calulDistance(this.population[f]);//Calculate fitness
-
-    }
-}
-
-//For fitness function
-function fitness() {
-
-}
-
-//calculate distances
 function calculateDistance(onePopulation) {
     var dis = 0;
     var temp = onePopulation.a;
@@ -258,17 +276,23 @@ function calculateDistance(onePopulation) {
     }
 }
 
-//
-function searchVert(fisrt, second) {
+function calcDistance(points, order) {
+    var sum = 0;
 
+    for (var i = 0; i < order.length; i++) {
+        var cityAIndex = order[i];
+        var cityA = points[cityAIndex];
+        var cityBIndex = order[i + 1];
+        var cityB = points[cityBIndex];
+        var d = dist(cityA.x, cityA.y, cityB.x, cityB.y);
+        sum += d;
+    }
 
+    return sum;
 }
 
-function generatChromosome() {
-
-}
-
-function cycleCrossOver(a, b) {
+//Do cycle cross-over for two parents
+function cycleCrossOver(a, b, indexA, indexB) {
     var parent1 = [];
     var parent2 = [];
     // copy the two parent to the parent1 and parent2 
@@ -341,11 +365,101 @@ function cycleCrossOver(a, b) {
             }
         } 
     }
-    var chiled = chiled1.concat(chiled2);
-    return chiled;
-
+    //Added by Sam
+    this.population[indexA].a = chiled1;
+    this.population[indexB].a = chiled2;
+    //Ended
+    //var chiled = chiled1.concat(chiled2);
+    //return chiled;
 }
 
+//Sam: To create only one population
+function population(numPop) {
+    for (var f = 0; f < numPop; f++) {
+        var order = [];
+        for (var i = 0; i < this.vertnum - 1; i++) {
+            order[i] = i + 1;
+        }
+        this.population[f] =
+        {
+            a: order,
+            f: Infinity         //for fitness value
+        };
+        var temp = shuffle(order);
+        temp.splice(0, 0, 0);   //First node in the path
+        temp.push(0);           //Last node in the path
+        this.population[f].a = temp;
+    }
+}
+
+//Sam: For fitness function
+function fitness() {
+    var dis = 0;
+    for (var i = 0; i < this.population.length; i++) {
+        var temp = this.population[i].a;
+        for (var j = 0; j < temp.length; j++) {
+            var v = this.vert[temp[j]];         //Get the current node
+            dis += v.findDis(temp[j + 1]);      //Summation the distance between current and next node
+        }
+        this.population[i].f = dis;
+        if (dis < this.recordPath) {
+            this.recordPath = dis;
+            this.bestPopu = this.population[i].a;
+            this.flag = 1;
+        }
+        dis = 0;
+    }
+
+    //Find two minimum parent
+    this.firstSmall = this.secondSmall = Infinity;
+    for (var i = 0; i < this.population.length; i++) {
+        var temp = this.population[i].f;
+        // If current element is smaller than first then update both first and second 
+        if (temp < this.firstSmall) {
+            this.secondSmall = this.firstSmall;
+            this.firstSmall = this.population[i].a;
+        }
+        //If temp is in between first and second then update second  
+        else if (temp < this.secondSmall && temp != this.firstSmall)
+            this.secondSmall = this.population[i].a;
+    }
+}
+
+//Sam: Find distance of two nodes
+function findDistance(nextNode) {
+    var adjList = this.adjacent.traverse();     //Find the adjacent of the node
+    var sum = 0;
+    for (var j = 0; j < adjList.length; j++) {  //Look for the matching one
+        if (adjList[j].target == nextNode) {
+            return adjList[j].distanc;          //Return the distance
+        }
+    }
+    return 0;
+}
+
+//Do Inversion Mutation
+function inversionMutation(chromosom) {
+    var indexA, indexB;
+    var subArray;
+    var chromSize = chromosom.length - 2;
+    do {
+        indexA = Math.floor((Math.random() * chromSize) + 1);
+        indexB = Math.floor((Math.random() * chromSize) + 1);
+    } while (indexA == indexB);
+    //get sub-array from the original
+    if (indexA > indexB) {
+        var temp = indexA;
+        indexA = indexB;
+        indexB = temp;
+    }
+    subArray = chromosom.slice(indexA, indexB + 1);
+    subArray = subArray.reverse();
+    for (var i = 0; i < subArray.length; i++) {
+        chromosom[indexA + i] = subArray[i];
+    }
+}
+
+//Shuffle an array
 function shuffle(array) {
     var m = array.length, t, i;
 
@@ -362,19 +476,36 @@ function shuffle(array) {
     return array;
 }
 
-function calcDistance(points, order) {
-    var sum = 0;
-
-    for (var i = 0; i < order.length; i++) {
-        var cityAIndex = order[i];
-        var cityA = points[cityAIndex];
-        var cityBIndex = order[i + 1];
-        var cityB = points[cityBIndex];
-        var d = dist(cityA.x, cityA.y, cityB.x, cityB.y);
-        sum += d;
-    }
-
-    return sum;
+//Swap Mutation function 
+function swapMutation(chromosom) {
+    var indexA, indexB;
+    //swap random order elements 
+    do {
+        indexA = getRandomArbitrary(1, chromosom.length - 1);
+        indexB = getRandomArbitrary(1, chromosom.length - 1);
+    } while (indexA == indexB);
+    swap(chromosom, indexA, indexB);
+    document.write(">> After Swap Mutation: ", chromosom);
 }
 
+//single Point CrossOver operator
+//it cross 2 parent over to form a newer 2 childeren
+function singlePointCrossOver(chromosom1, chromosom2) {
 
+    var firstChromoStartHalf, firstChromoLastHalf, secondChromoStartHalf, secondChromoLastHalf;
+
+    secondChromoStartHalf = chromosom2.slice(1, 3);
+    firstChromoLastHalf = chromosom1.slice(3, 5);
+
+    firstChromoStartHalf = chromosom1.slice(1, 3);
+    secondChromoLastHalf = chromosom2.slice(3, 5);
+
+    this.newChild1 = chromosom2.slice(0, 1).concat(secondChromoLastHalf.concat(firstChromoStartHalf));
+    this.newChild1 = this.newChild1 + ",0";
+
+
+    this.newChild2 = chromosom1.slice(0, 1).concat(firstChromoLastHalf.concat(secondChromoStartHalf));
+    this.newChild2 = this.newChild2 + ",0";
+
+    document.write(">> After single point cross-over new first child: ", this.newChild1, " , new second child: ", this.newChild2,"<br>");
+}
