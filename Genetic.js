@@ -36,12 +36,12 @@ function main() {
     ];
 
     var totalCities = 5;
-    var Fitness =[];
+    var Fitness = [];
     var recordDistance = Infinity;
     var population = [];
     var popSize = 10;
-    var bestEver = []; 
-    
+    var bestEver = [];
+
     //Create graph
     var g = new Graph();
     g.create_map(_v, _e);
@@ -52,6 +52,9 @@ function main() {
     g.generatePopulation(10);
     for (var i = 0; i < g.population.length; i++)
         document.write(g.population[i].a, "<br>");
+
+    document.write("<br>", "Cycle cross over:", "<br>");
+    document.write(cycleCrossOver(g.population[0].a, g.population[1].a), "<br>");
 }
 
 //Graph class to represent visualization map
@@ -226,7 +229,7 @@ function population(numPop) {
         this.population[f].a = temp;
         //document.write(this.population[f]);
         //this.population[f].f = calulDistance(this.population[f]);//Calculate fitness
-        
+
     }
 }
 
@@ -251,19 +254,95 @@ function calculateDistance(onePopulation) {
             if (adjList[j].target == nextNode) {
                 dis += adjList[j].distanc;
             }
-        }        
+        }
     }
 }
 
 //
 function searchVert(fisrt, second) {
+
+
 }
 
 function generatChromosome() {
 
 }
 
-function crossOver() {
+function cycleCrossOver(a, b) {
+    var parent1 = [];
+    var parent2 = [];
+    // copy the two parent to the parent1 and parent2 
+    for (var i = 0; i < a.length; i++) {
+        parent1[i] = { node: a[i], visited: false, cycle: 0 };
+        parent2[i] = { node: b[i], visited: false, cycle: 0 };
+    }
+
+    var c = 1;
+    var count = 0;
+    var array = 1;
+    var chiled1 = [];
+    var chiled2 = [];
+    chiled1[0]=0;
+    chiled2[0]=0;
+    chiled1[parent1.length-1]=0;
+    chiled2[parent2.length-1]=0;
+    for (var i = 1; i < parent1.length  && array <= 4; i = c,array++) {
+        if ((parent1[i].visited == false)  ) {
+            parent1[i].visited = true;
+            parent2[i].visited = true;
+            parent1[i].cycle = count;
+            parent2[i].cycle = count;
+            if (parent1[i].node == parent2[i].node) {
+                
+                for (var k = 1; k < parent1.length - 1; k++) {
+                    if (parent1[k].visited == false ) {
+                        c = k;
+                        break;
+                    }
+                }
+                chiled1[i] = parent1[i].node;
+                chiled2[i] = parent2[i].node;
+                count++;
+            }
+            else {
+                for (var j = 1; j < parent1.length - 1; j++) {
+                    if (parent2[i].node == parent1[j].node && parent1[j].visited == false) {
+                        c = j;
+                        break;
+                    }
+                    // end of the cycle copy visted nodes
+                    else if (parent2[i].node == parent1[j].node && parent1[j].visited == true) {
+                        
+                        for (var k = 1; k < parent1.length - 1; k++) {
+                            if (parent1[k].visited == true && parent1[k].cycle % 2 == 0) {
+                                chiled1[k] = parent1[k].node;
+                                
+                            } else if (parent1[k].visited == true && parent1[k].cycle % 2 == 1) {
+                                chiled2[k] = parent1[k].node;
+                            }
+                            if (parent2[k].visited == true && parent1[k].cycle % 2 == 0) {
+                                chiled2[k] = parent2[k].node;
+                            }
+                            else if (parent2[k].visited == true && parent2[k].cycle % 2 == 1) {
+                                chiled1[k] = parent2[k].node;
+                            }
+                        }
+                        count++;
+                        for (var k = 1; k < parent1.length - 1; k++) {
+                            if (parent1[k].visited == false ) {
+                                c = k;
+                                break;
+                            }
+                        }
+                        
+                        break;
+                    }
+                }
+            }
+        } 
+    }
+    var chiled = chiled1.concat(chiled2);
+    return chiled;
 
 }
 
@@ -272,21 +351,21 @@ function shuffle(array) {
 
     // While there remain elements to shuffle…
     while (m) {
-            // Pick a remaining element…
-            i = Math.floor(Math.random() * m--);
+        // Pick a remaining element…
+        i = Math.floor(Math.random() * m--);
 
-            // And swap it with the current element.
-            t = array[m];
-            array[m] = array[i];
-            array[i] = t;
+        // And swap it with the current element.
+        t = array[m];
+        array[m] = array[i];
+        array[i] = t;
     }
     return array;
 }
 
-function calcDistance(points, order){
+function calcDistance(points, order) {
     var sum = 0;
 
-    for (var i = 0; i < order.length ; i++){
+    for (var i = 0; i < order.length; i++) {
         var cityAIndex = order[i];
         var cityA = points[cityAIndex];
         var cityBIndex = order[i + 1];
