@@ -488,24 +488,51 @@ function swapMutation(chromosom) {
     document.write(">> After Swap Mutation: ", chromosom);
 }
 
-//single Point CrossOver operator
-//it cross 2 parent over to form a newer 2 childeren
+//single Point Crossover operator
+//it cross 2 parent over to form a newer childeren
 function singlePointCrossOver(chromosom1, chromosom2) {
+    var parent1 = [];
+    var parent2 = [];
+    var child1 = [];
+    var child2 = [];
+    
+    child1[0]=0;
+    child2[0]=0;
 
-    var firstChromoStartHalf, firstChromoLastHalf, secondChromoStartHalf, secondChromoLastHalf;
+    // copy the two chromosoms to the parent1 and parent2 
+    for (var i = 0; i < chromosom1.length; i++) {
+        parent1[i] = chromosom1[i];
+        parent2[i] = chromosom2[i];
+    }
 
-    secondChromoStartHalf = chromosom2.slice(1, 3);
-    firstChromoLastHalf = chromosom1.slice(3, 5);
+    // crossPoint is at index 2 
+    var crossPoint = (parent1.length - 2) / 2; 
 
-    firstChromoStartHalf = chromosom1.slice(1, 3);
-    secondChromoLastHalf = chromosom2.slice(3, 5);
+    //generating the first half of children 
+    for(var i = 1; i < crossPoint ; i++){
+        child1[i] = parent1[i];
+        child2[i] = parent2[i];
+    }
 
-    this.newChild1 = chromosom2.slice(0, 1).concat(secondChromoLastHalf.concat(firstChromoStartHalf));
-    this.newChild1 = this.newChild1 + ",0";
+    //obtaining child 1 from parent 2 with no repating points
+    for(var i = 1; i < parent2.length-1 ; i++){
+        var point = parent2[i];
+        if (!child1.includes(point)){
+            child1.push(point);
+        }
+    }
+    
+    //obtaining child 2 from parent 1 with no repating points   
+    for(var i = 1; i < parent1.length -1 ; i++){
+        var point = parent1[i];
+        if (!child2.includes(point)){
+            child2.push(point);
+        }
+    }
+    //end of the child is source node 
+    child1.push(0);
+    child2.push(0);
 
-
-    this.newChild2 = chromosom1.slice(0, 1).concat(firstChromoLastHalf.concat(secondChromoStartHalf));
-    this.newChild2 = this.newChild2 + ",0";
-
-    document.write(">> After single point cross-over new first child: ", this.newChild1, " , new second child: ", this.newChild2,"<br>");
+    var res = child1.concat(child2);
+    return res;
 }
