@@ -75,7 +75,11 @@ function main() {
         //Apply cycle cross-over
         for (var i = 0; i < g.population.length; i += 2)
             g.cycleCrossover(g.population[i].a, g.population[i+1].a, i, i+1);
-    
+        
+        //Apply single point cross-over
+        document.write("single point cross over: ")
+        document.write(g.doSinglePointCrossOver(g.population[0].a, g.population[1].a));
+        
         //Apply inversion mutation
         for (var i = 0; i < g.population.length; i++) {
             g.inversionMut(g.population[i].a);
