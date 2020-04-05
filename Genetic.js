@@ -500,6 +500,7 @@ function singlePointCrossOver(chromosom1, chromosom2) {
     var child1 = [];
     var child2 = [];
     
+  
     child1[0]=0;
     child2[0]=0;
 
@@ -509,9 +510,9 @@ function singlePointCrossOver(chromosom1, chromosom2) {
         parent2[i] = chromosom2[i];
     }
 
-    // crossPoint is at index 2 
-    var crossPoint = (parent1.length - 2) / 2; 
 
+    var crossPoint = Math.round(parent1.length/2); // get the mid point index 
+   
     //generating the first half of children 
     for(var i = 1; i < crossPoint ; i++){
         child1[i] = parent1[i];
@@ -524,6 +525,7 @@ function singlePointCrossOver(chromosom1, chromosom2) {
         if (!child1.includes(point)){
             child1.push(point);
         }
+
     }
     
     //obtaining child 2 from parent 1 with no repating points   
@@ -532,11 +534,14 @@ function singlePointCrossOver(chromosom1, chromosom2) {
         if (!child2.includes(point)){
             child2.push(point);
         }
+
     }
+    
     //end of the child is source node 
     child1.push(0);
     child2.push(0);
 
     var res = child1.concat(child2);
     return res;
+
 }
